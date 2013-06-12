@@ -1,0 +1,54 @@
+#game-area {
+  width: 1024px;
+  height: 724px;
+  background-color: lightblue;
+  border: 1px solid black;
+  position: relative;
+}
+
+#timer {
+  height: 50px;
+  width: 200px;
+  position: absolute;
+  background-color: red;
+}
+
+#notification {
+  position: absolute;
+  width: 100%;
+
+  #chef {
+    height: 100px;
+    width: 300px;
+    margin: 0 auto;
+    background-color: green;
+  }
+}
+
+#station {
+  height: 500px;
+  width: 1000px;
+  margin: 200px auto 0 auto;
+}
+
+#plate {
+  float: left;
+  height: 500px;
+  width: 500px;
+  background-color: fuchsia;
+}
+
+#mise-en-place {
+  float: left;
+  height: 500px;
+  width: 500px;
+  background-color: orange;
+
+  .ingredient {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+    background-color: white;
+    border: 1px solid black;
+  }
+}
