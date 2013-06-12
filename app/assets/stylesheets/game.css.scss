@@ -31,24 +31,40 @@
   margin: 200px auto 0 auto;
 }
 
+.ingredient {
+  height: 75px;
+  width: 75px;
+  background-color: white;
+  border: 1px solid black;
+  cursor: pointer;
+}
+
 #plate {
+  position: relative;
   float: left;
   height: 500px;
-  width: 500px;
+  width: 475px;
+  margin-right: 50px;
   background-color: fuchsia;
+
+  &.over {
+    border: 2px dashed #000;
+    margin-right: 46px;
+  }
+
+  .ingredient {
+    position: absolute;
+  }
 }
 
 #mise-en-place {
   float: left;
   height: 500px;
-  width: 500px;
+  width: 475px;
   background-color: orange;
 
   .ingredient {
     display: inline-block;
-    height: 50px;
-    width: 50px;
-    background-color: white;
-    border: 1px solid black;
+    margin: 20px 50px;
   }
 }
