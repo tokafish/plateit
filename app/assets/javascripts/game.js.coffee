@@ -23,17 +23,23 @@ $ ->
     e.dataTransfer.dropEffect = 'move'
     false
 
+  handleOffset = null
+
   $(".ingredient").on "dragstart", (e) ->
     # var dragIcon = document.createElement('img');
     # dragIcon.src = 'logo.png';
     # dragIcon.width = 100;
     # e.dataTransfer.setDragImage(dragIcon, -10, -10);
 
-    console.log "start - original event: ", e.originalEvent
+    ingredientOffset = $(this).offset()
 
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('html', $(this).html());
-    e.dataTransfer.setData('startCoords', [e.originalEvent.clientX, e.originalEvent.clientY])
+    handleOffset = {
+      x: e.originalEvent.clientX - ingredientOffset.left,
+      y: e.originalEvent.clientY - ingredientOffset.top
+    }
+
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData('html', $(this).html())
 
   $(".ingredient").on "dragend", ->
     console.log "drag end"
@@ -43,15 +49,15 @@ $ ->
       e.stopPropagation()
 
     content = e.dataTransfer.getData('html')
-    startCoords = e.dataTransfer.getData('startCoords')
 
     ingredient = $("<div class='ingredient'>").html(content)
 
-    offset = $(this).offset()
-    console.log "offset: ", offset
-    console.log "original event: ", e.originalEvent
-    ingredient.css("top", e.originalEvent.clientY - offset.top)
-    ingredient.css("left", e.originalEvent.clientX)
+    plateOffset = $(this).offset()
+
+    top = e.originalEvent.clientY - handleOffset.y - plateOffset.top
+    left = e.originalEvent.clientX - handleOffset.x - plateOffset.left
+
+    ingredient.css("top", top)
+    ingredient.css("left", left)
 
     $(this).removeClass("over").append(ingredient)
-    console.log "drop", e.dataTransfer.getData('html');
