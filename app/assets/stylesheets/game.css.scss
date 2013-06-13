@@ -1,7 +1,6 @@
 #game-area {
-  width: 1024px;
-  height: 724px;
-  background-color: lightblue;
+  width: 1224px;
+  height: 900px;
   border: 1px solid black;
   position: relative;
 }
@@ -13,10 +12,19 @@
   background-color: red;
 }
 
+#done {
+  height: 50px;
+  width: 200px;
+  position: absolute;
+  top: 50px;
+  cursor: pointer;
+  z-index: 1;
+}
+
 #notification {
   position: absolute;
   width: 100%;
-
+  z-index: 0;
   #chef {
     height: 100px;
     width: 300px;
@@ -27,32 +35,31 @@
 
 #station {
   height: 500px;
-  width: 1000px;
+  width: 1200px;
   margin: 200px auto 0 auto;
 }
 
 .ingredient {
   height: 75px;
   width: 75px;
-  background-color: white;
-  border: 1px solid black;
   cursor: pointer;
 }
 
 #plate {
   position: relative;
   float: left;
-  height: 500px;
-  width: 475px;
+  width: image-width('plate.png') / 2;
+  height: image-height('plate.png') / 2;
+  background-size: image-width('plate.png') / 2 image-height('plate.png') / 2;
   margin-right: 50px;
-  background-color: fuchsia;
+  background-image: image-url('plate.png');
 
   &.over {
     border: 2px dashed #000;
     margin-right: 46px;
   }
 
-  .ingredient {
+  .ingredient, .target   {
     position: absolute;
   }
 }
@@ -61,10 +68,36 @@
   float: left;
   height: 500px;
   width: 475px;
-  background-color: orange;
 
   .ingredient {
     display: inline-block;
     margin: 20px 50px;
+  }
+}
+
+$ingredients: asparagus parsley ravioli;
+
+@each $ingredient in $ingredients {
+  $image: "ingredients/" + $ingredient + ".png";
+  $outline: "ingredients/" + $ingredient + "-outline.png";
+
+  .#{$ingredient} {
+    $width: image-width($image) / 2;
+    $height: image-height($image) / 2;
+
+    width: $width;
+    height: $height;
+    background-size: $width $height;
+    background-image: image-url($image);
+  }
+
+  .#{$ingredient}-outline {
+    $width: image-width($outline) / 2;
+    $height: image-height($outline) / 2;
+
+    width: $width;
+    height: $height;
+    background-size: $width $height;
+    background-image: image-url($outline);
   }
 }
