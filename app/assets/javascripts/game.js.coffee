@@ -7,12 +7,18 @@ $.event.props.push('dataTransfer');
 $.event.props.push('clientX');
 $.event.props.push('clientY');
 
-getTargets = ->
-  [
-    { name: "ravioli", x: 165, y: 155 },
-    { name: "asparagus", x: 100, y: 270 },
-    { name: "asparagus", x: 300, y: 300 }
+targets = null
+
+randomInt = (max) ->
+  Math.floor(Math.random() * max)
+
+setupTargets = ->
+  targets = [
+    { name: "parsley", x: _.random(25, 400), y: _.random(25, 375) },
+    { name: "asparagus", x: _.random(25, 400), y: _.random(25, 375) },
+    { name: "ravioli", x: _.random(25, 400), y: _.random(25, 375) }
   ]
+getTargets = -> targets
 
 distance = (coord1, coord2) ->
   xDist = coord2.x - coord1.x
@@ -55,6 +61,9 @@ minDeduction = (targets, ingredients) ->
 
   _.min(deductions)
 
+clearPlate = ->
+  $("#plate").html("")
+
 placeOutlines = ->
   _.each getTargets(), (target) ->
     outline = $("<div class='target #{target.name}-outline'>")
@@ -64,28 +73,108 @@ placeOutlines = ->
     $("#plate").append outline
 
 hideOutlines = ->
-  $("#plate .target").hide()
+  $("#plate .target").delay(500).fadeOut('slow')
 
-showOutlines = ->
-  $("#plate .target").show()
+gameOver = ->
+  clearTimeout(ramsayTimer) if ramsayTimer
+
+  $("#timer").hide()
+  $("#action-button").off 'click'
+  $("#action-button").text("Start Game")
+  $("#action-button").on 'click', startGame
+
+  $("#top-bar").slideDown()
+  $(".bubble").text("You finished #{roundsComplete} rounds.")
+
+startCountdown = (expiration) ->
+  $('#timer').countdown('destroy')
+  $('#timer').countdown(
+    until: expiration, compact: true,
+    format: 'MS', description: '',
+    onExpiry: gameOver
+  )
+
+RAMSAY_QUOTES = {
+  good: ["Just, just just, what do you want a @#$%&! medal?", "You think you're smart don't you?", "And how long have you been working as a professional chef?"]
+  neutral: ["You're sweating in the @#$%&! food!", "Wake up and get it back together!", "You're pushing me to the @#$%&! limit big boy."]
+  bad: ["SHUT IT DOWN! TURN IT OFF, YOU @#$%&!! STOP IT!", "Look at me. Let's be honest, you're done. You can't waste my time any longer!", "GET YOUR JACKET OFF AND GET OUT!"]
+}
+
+ramsayTimer = null
+
+finishRound = ->
+  clearTimeout(ramsayTimer) if ramsayTimer
+
+  roundsComplete += 1
+  max = getTargets().length * 100
+  score = max - minDeduction()
+  if (score > 200)
+    message = _.shuffle(RAMSAY_QUOTES.good)[0]
+    klass = "good"
+    nextRound(5)
+  else if (score > 100)
+    message = _.shuffle(RAMSAY_QUOTES.neutral)[0]
+    klass = "neutral"
+    nextRound()
+  else
+    message = _.shuffle(RAMSAY_QUOTES.bad)[0]
+    klass = "bad"
+    stopClick = (e) -> e.preventDefault() ; false
+    $("body").on 'mousedown', stopClick
+    nextRound()
+
+  $(".bubble").addClass(klass).text(message)
+  $("#top-bar").slideDown()
+  ramsayTimer = setTimeout ->
+    ramsayTimer = null
+    if stopClick
+      $("body").off 'mousedown', stopClick
+    $(".bubble").removeClass(klass)
+    $("#top-bar").slideUp()
+  , 3000
+
+expiration = null
+
+roundsComplete = null
+startGame = ->
+  roundsComplete = 0
+  $("#top-bar").hide()
+  $("#timer").show()
+  $("#action-button").off 'click'
+  $("#action-button").text("Done")
+  $("#action-button").on 'click', finishRound
+
+  seconds = 25
+  now = new Date()
+  expiration = new Date(now.getTime() + seconds * 1000);
+
+  clearPlate()
+  setupTargets()
+  placeOutlines()
+  startCountdown(expiration)
+
+nextRound = (additionalTime) ->
+  clearPlate()
+  setupTargets()
+  placeOutlines()
+
+  if additionalTime?
+    expiration = new Date(expiration.getTime() + additionalTime * 1000)
+    startCountdown(expiration)
+
 
 $ ->
   $("#plate").on "dragover", (e) ->
     e.preventDefault()
     false
 
-  placeOutlines()
-
-  console.log $("#done")
-  $("#done").on 'click', ->
-    max = getTargets().length * 100
-    score = max - minDeduction()
-    alert("Your score is: " + score)
+  $("#action-button").on 'click', startGame
 
   # calculate the offset between the cursor and top-left
   # corner of an ingredient when dragging starts anywhere
   dragHandleOffset = null
   $("#station").on "dragstart", ".ingredient", (e) ->
+    hideOutlines()
     containerOffset = $(@).offset()
 
     dragHandleOffset =
@@ -98,13 +187,9 @@ $ ->
     e.dataTransfer.effectAllowed = 'move'
 
   $("#mise-en-place .ingredient").on "dragstart", (e) ->
-    # var dragIcon = document.createElement('img');
-    # dragIcon.src = 'logo.png';
-    # dragIcon.width = 100;
-    # e.dataTransfer.setDragImage(dragIcon, -10, -10);
-
-    e.dataTransfer.effectAllowed = 'copy'
     draggedIngredient = $(@).clone()
+
+    e.dataTransfer.effectAllowed = 'move'
 
   $("#plate").on "drop", (e) ->
     e.stopPropagation()

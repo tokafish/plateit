@@ -1,42 +1,107 @@
+@import "compass/css3/border-radius";
+@import "compass/utilities/general/clearfix";
+
 #game-area {
   width: 1224px;
-  height: 900px;
+  height: 750px;
   border: 1px solid black;
   position: relative;
 }
 
-#timer {
-  height: 50px;
-  width: 200px;
+#hud {
   position: absolute;
-  background-color: red;
+  z-index: 10;
+  #timer {
+    display: none;
+    float: left;
+    height: 30px;
+    line-height: 30px;
+    width: 80px;
+    text-align: center;
+    padding: 5px;
+  }
+
+  #action-button {
+    float: left;
+    height: 30px;
+    width: 80px;
+    cursor: pointer;
+    z-index: 1;
+    margin: 5px 0 0 5px;
+  }
 }
 
-#done {
-  height: 50px;
-  width: 200px;
-  position: absolute;
-  top: 50px;
-  cursor: pointer;
-  z-index: 1;
-}
-
-#notification {
+#top-bar {
   position: absolute;
   width: 100%;
-  z-index: 0;
-  #chef {
-    height: 100px;
-    width: 300px;
+  z-index: 5;
+  display: none;
+
+  #notification {
     margin: 0 auto;
-    background-color: green;
+    width: (image-width('chef.png') / 2) + 450;
+    background-color: white;
+    border: 1px solid #CCC;
+
+    @include clearfix;
+    #chef {
+      float: left;
+      width: image-width('chef.png') / 2;
+      height: image-height('chef.png') / 2;
+      background-size: image-width('chef.png') / 2 image-height('chef.png') / 2;
+      background-image: image-url('chef.png');
+    }
+    .bubble {
+      float: left;
+      margin: 50px 0px 0px 15px;
+      position: relative;
+      width: 350px;
+      height: 75px;
+      padding: 25px;
+      background: #FFFFFF;
+      border: #000 solid 2px;
+      @include border-radius(30px);
+
+      &.good {
+        color: green;
+      }
+
+      &.bad {
+        color: red;
+      }
+      &:after {
+        content: "";
+        position: absolute;
+        top: 72px;
+        left: -15px;
+        border-style: solid;
+        border-width: 10px 15px 10px 0;
+        border-color: transparent #FFFFFF;
+        display: block;
+        width: 0;
+        z-index: 1;
+      }
+
+      &:before {
+        content: "";
+        position: absolute;
+        top: 71px;
+        left: -18px;
+        border-style: solid;
+        border-width: 11px 16px 11px 0;
+        border-color: transparent #000;
+        display: block;
+        width: 0;
+        z-index: 0;
+      }
+    }
   }
 }
 
 #station {
   height: 500px;
   width: 1200px;
-  margin: 200px auto 0 auto;
+  margin: 100px auto 0 auto;
 }
 
 .ingredient {
@@ -71,7 +136,6 @@
 
   .ingredient {
     display: inline-block;
-    margin: 20px 50px;
   }
 }
 
@@ -89,6 +153,16 @@ $ingredients: asparagus parsley ravioli;
     height: $height;
     background-size: $width $height;
     background-image: image-url($image);
+
+    &.small {
+      $width: image-width($image) / 4;
+      $height: image-height($image) / 4;
+
+      width: $width;
+      height: $height;
+      background-size: $width $height;
+
+    }
   }
 
   .#{$ingredient}-outline {
