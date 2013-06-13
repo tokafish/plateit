@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 ruby '1.9.3'
 
 gem 'rails', '4.0.0.rc2'
-gem 'sqlite3'
+gem 'pg'
 
 gem 'sass-rails', '~> 4.0.0.rc2'
 gem "compass-rails", github: "milgner/compass-rails", branch: "rails4"
